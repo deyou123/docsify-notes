@@ -1,9 +1,10 @@
-![logo](images/breezepython.png ':size=260x260')
+![logo](image/bc.jpg ':size=260x260')
 
-> 欢迎关注我：  
+> 一个神奇的网站
 >
 > deyou
 
 
 [CSDN](https://blog.csdn.net/qq_21344887)
-[GitHub](https://github.com/deyou123)
+[GitHub](https://github.com/deyou123/deyou123.github.io)
+

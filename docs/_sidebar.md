@@ -2,5 +2,7 @@
 
 * [首页](/)
 * [指南](/guide)
-* [spring boot](/markdown/springboot/)
-* [Spring MVC](/markdown/SpringMVC/)
+* [Java 基础](markdown/java/)
+* [leetcode]()
+* [项目实战](/markdown/demo/)
+

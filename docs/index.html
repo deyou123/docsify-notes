@@ -25,6 +25,7 @@
             maxLevel: 4,
             // 自定义侧边栏后默认不会再生成目录，设置生成目录的最大层级，建议配置为1或者2
             subMaxLevel: 4,
+            mergeNavbar: true,
             // 外链表达式
             externalLinkTarget: '_blank',
 
@@ -53,28 +54,35 @@
                 '/.*/_navbar.md': '/_navbar.md',
                 '/.*/_sidebar.md': '/_sidebar.md',
             },
-            logo: '#暂时没有',
+            logo: '/image/bc.jpg',
             name: 'Deyou 个人博客',
             repo: 'https://github.com/deyou123/deyou123.github.io',
-            footer: {
-                copy: '<span>邮箱：zhaideyou@qq.com &copy; 2021. </span>',
-                auth: 'All rights reserved',
-                pre: '<hr/>',
-                style: 'text-align: right;',
-                class: 'className',
+            plugins: [
+                function(hook) {
+                    var footer = [
+                        '<hr/>',
+                        '<footer>',
+                        '<span><a href="https://github.com/deyou123">deyou</a> &copy;2021.</span>',
+                        '<span>Proudly published with <a href="https://deyou123.github.io" target="_blank">docsify</a>.</span>',
+                        '</footer>'
+                    ].join('');
 
-            },
+                    hook.afterEach(function(html) {
+                        return html + footer;
+                    });
+                }
+            ]
         }
     </script>
 
-
-    <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/disqus.min.js"></script>
+    </script>
+    <!-- <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/disqus.min.js"></script> -->
     <!-- docsify的js依赖 -->
     <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
     <!-- emoji表情支持 -->
     <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
     <!-- 图片放大缩小支持 -->
-    <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
+    <!--<script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>-->
     <!-- 搜索功能支持 -->
     <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
     <!--在所有的代码块上添加一个简单的Click to copy按钮来允许用户从你的文档中轻易地复制代码-->
@@ -97,7 +105,7 @@
 
     <!--docsify的分页导航插件-->
     <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
-    <!-- mouse click -->
+    <!-- mouse click heart sign -->
     <script src="//cdn.jsdelivr.net/gh/jerryc127/butterfly_cdn@2.1.0/js/click_heart.js"></script>
 
     <!-- alert 样式 -->
@@ -179,6 +187,33 @@
             document.getElementById("sitetime").innerHTML = " 🎮已运行 " + diffDays + " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 ";
         }
         siteTime();
+    </script>
+    <!-- Gitalk 评论系统 -->
+    <link rel="stylesheet" href="https://wugenqiang.gitee.io/notebook/plugin/gitalk.css">
+    <!-- Gitalk 评论系统 -->
+    <script src="https://wugenqiang.gitee.io/notebook/plugin/gitalk.js"></script>
+    <script src="https://wugenqiang.gitee.io/notebook/plugin/gitalk.min.js"></script>
+    <script src="https://wugenqiang.gitee.io/notebook/plugin/md5.min.js"></script>
+    <script>
+        // title_id需要初始化
+        window.title_id = window.location.hash.match(/#(.*?)([?]|$)/) ? window.location.hash.match(/#(.*?)([?]|$)/)[1] : '/';
+        const gitalk = new Gitalk({
+                clientID: 'f21d08e50d29f742f2b2',
+                clientSecret: 'eec380c20e271de70c7d379e6efe3a6137f1dccd',
+                repo: 'dmybolg',
+                owner: 'deyou123',
+                admin: ['deyou123'],
+                title: decodeURI(window.title_id),
+                distractionFreeMode: false, // 是否添加全屏遮罩
+                id: decodeURI(window.location.pathname), // 页面的唯一标识，gitalk 会根据这个标识自动创建的issue的标签,我们使用页面的相对路径作为标识
+                enableHotKey: true, // 提交评论快捷键(cmd/ctrl + enter)
+            })
+            // 监听URL中hash的变化，如果发现换了一个MD文件，那么刷新页面，解决整个网站使用一个gitalk评论issues的问题。
+        window.onhashchange = function(event) {
+            if (event.newURL.split('?')[0] !== event.oldURL.split('?')[0]) {
+                location.reload()
+            }
+        }
     </script>
 
 
