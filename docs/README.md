@@ -1,14 +1,6 @@
-# 首页
-一个神奇的文档网站生成器。
-[>>操作指南](/guide)
-
-# 指南
-
-# Java 基础
-
-# leetcode
-
-# 项目实战
-
-
+* [首页](/)
+* [指南](/guide)
+* [Java 基础](markdown/java/)
+* [leetcode](markdown/leetcode/)
+* [项目实战](/markdown/demo/)
 
