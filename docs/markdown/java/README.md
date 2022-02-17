@@ -12,3 +12,5 @@
 
 * ## [gradle教程](markdown/java/gradle.md)
 
+* ## [JDK8 新特性](markdown/java/gradle.md)
+
