@@ -12,6 +12,8 @@
 
 * [前端](/markdown/前端/)
 
+* [mybatis](/markdown/mybatis/)
+
 * [mybats-plus](/markdown/MybatisPlus/)
 
 
