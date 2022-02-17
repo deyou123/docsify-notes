@@ -1328,6 +1328,7 @@ public class CodeGenerator {
 
         //配置mapper接口名
         //packageConfig.setMapper(scanner("设置Mapper接口包名"));
+        
         //设置maper接口和xml 文件在同一目录下。需要在pom.xml 中配置
         //packageConfig.setXml(packageConfig.getMapper());
         //包
