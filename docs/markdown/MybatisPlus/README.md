@@ -1,4 +1,6 @@
-# leetcode 刷题笔记
+# Mybatis-plus笔记
 
-* [1 两数之和](/markdown/leetcode/01)
+* [基础篇](/markdown/MybatisPlus/01-MybatisPlus-基础篇.md)
+* 
+* [高级篇](/markdown/MybatisPlus/02-MybatisPlus-高级篇.md)
 
