@@ -10,7 +10,7 @@
 
 * [项目实战](/markdown/demo/)
 
-* # [设计模式]()
+* # [设计模式](markdown/设计模式/)
 
 	* [UML类图](markdown/设计模式/UML图.md)
 
