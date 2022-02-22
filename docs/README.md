@@ -1,22 +1,10 @@
-* [首页](/)
+# 个人博客
 
-* [指南](/guide)
+* 简介
+  * [基本介绍](md/README.md)
 
-* [Java 基础](markdown/java/)
+* 目录
 
-* [leetcode](markdown/leetcode/)
+  * [示例](md/Demo/README)
+  * [Java基础](md/Java/README)
 
-* [项目实战](/markdown/demo/)
-
-* [设计模式](/markdown/java23/)
-
-* [前端](/markdown/前端/)
-
-* [mybatis](/markdown/mybatis/)
-
-* [mybats-plus](/markdown/MybatisPlus/)
-
-
-​	
-
-docsify serve docs
