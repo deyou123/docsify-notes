@@ -1,7 +1,7 @@
 #  Java设计模式
 
 
-* [UML类图](md/Java23/UML图)
+* [UML类图](md/Java23/UML图.md)
 
 *  [Java23七大原则](md/Java23/设计模式七大原则.md)
 
