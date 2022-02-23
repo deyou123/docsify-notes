@@ -6,7 +6,7 @@
 
 
 
-*  [UML类图](markdown/Java23/UML图.md)
+*  [UML类图](markdown/Java23/UML图)
 
 *  [Java23七大原则](markdown/Java23/设计模式七大原则.md)
 
