@@ -1,10 +1,12 @@
-#  Java设计模式
+# Java 设计模式
+* **目录**
+  * [根目录（/）](/README)
+  * [回到上一级（../）](/README)
 
-## 目录
 
-* [第一章](/md/Demo/chapter01)
 
-** [UML类图](markdown/Java23/UML图.md)
+
+*  [UML类图](markdown/Java23/UML图.md)
 
 *  [Java23七大原则](markdown/Java23/设计模式七大原则.md)
 
@@ -31,3 +33,5 @@
 *  [命令模式](markdown/Java23/命令模式.md)
 
 *  [责任链模式](markdown/Java23/责任链模式.md)
+
+
