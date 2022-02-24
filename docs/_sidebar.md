@@ -8,7 +8,7 @@
     
     * [Java设计模式](md/Java23/README)
     
-    
+    * [Effective Java3](md/EffectiveJava3/README)
     
     
 
