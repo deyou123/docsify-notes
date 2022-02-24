@@ -8,7 +8,7 @@
 
 - 简单、轻便 (压缩后 ~21kB)
 - 无需生成 html 文件
-- 众多主题
+- 众多主题2
 
 [GitHub](https://github.com/deyou123/docsify-notes)
 [Gitee](https://gitee.com/deyou123/docsify-notes)
