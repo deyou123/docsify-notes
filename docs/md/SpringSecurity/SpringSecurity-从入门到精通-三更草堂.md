@@ -1067,6 +1067,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ~~~~
 
+
+
+
+
+
+
+
+
+
+
 ##### 2.3.3.3 登陆接口
 
 ​	接下我们需要自定义登陆接口，然后让SpringSecurity对这个接口放行,让用户访问这个接口的时候不用登录也能访问。
@@ -1128,6 +1138,47 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 ​	
 
+
+
+##### 
+
+
+
+###### 2.3.3.3.1 登录接口实现 不使用jwt
+
+```java
+public class LoginServiceImpl implements LoginService {
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Override
+    public ResponseResult login(User user) {
+        //认证
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken( user.getUserName(), user.getPassword() );
+        Authentication authenticate = authenticationManager.authenticate( token );
+        if(Objects.isNull(authenticate)){
+            throw new RuntimeException("用户名或者密码错误");
+        }
+        LoginUser details = (LoginUser) authenticate.getDetails();
+        LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
+        return new ResponseResult( 200, loginUser);
+    }
+}
+```
+
+**PostMan 测试**
+
+![image-20220228191227722](images/image-20220228191227722.png)
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+###### 2.3.3.3.2 使用JWT 个人接口实现
+
 ~~~~java
 @Service
 public class LoginServiceImpl implements LoginServcie {
@@ -1159,7 +1210,36 @@ public class LoginServiceImpl implements LoginServcie {
 
 ~~~~
 
+**本机测试**注意要开启redis 服务。没有配置redis,使用的默认配置
 
+测试代码
+
+![](images/image-20220228194627497.png)
+
+![image-20220301110118606](images/image-20220301110118606.png)
+
+**远程测试**(使用远程测试其实只修改主机和端口号就好了，其他可以使用默认配置)
+
+```yml
+spring:
+  redis:
+    host: 192.168.247.128
+    port: 6379
+    database: 0
+    connect-timeout: 1800000
+    lettuce:
+      pool:
+        max-active: 20
+        max-wait: -1ms
+        max-idle: 5
+        min-idle: 0
+```
+
+在次测试
+
+![image-20220228194423798](images/image-20220228194423798.png)
+
+![image-20220301110110018](images/image-20220301110110018.png)
 
 ##### 2.3.3.4 认证过滤器
 
@@ -1264,9 +1344,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 ​	我们只需要定义一个登陆接口，然后获取SecurityContextHolder中的认证信息，删除redis中对应的数据即可。
 
 ~~~~java
-/**
- * @Author 三更  B站： https://space.bilibili.com/663528522
- */
 @Service
 public class LoginServiceImpl implements LoginServcie {
 
@@ -1306,7 +1383,7 @@ public class LoginServiceImpl implements LoginServcie {
 
 ~~~~
 
-
+注意： 使用一级接口的时候，
 
 
 
@@ -1489,12 +1566,30 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new RuntimeException("用户名或密码错误");
         }
         //TODO 根据用户查询权限信息 添加到LoginUser中
+        
         List<String> list = new ArrayList<>(Arrays.asList("test"));
         return new LoginUser(user,list);
     }
 }
 
 ~~~~
+
+这里通过` List<String> list = new ArrayList<>(Arrays.asList("test")); `是使每个用户的权限写死了。
+
+在HelloController
+
+```java
+//测试写死的接口
+@GetMapping("/test")
+@PreAuthorize( "hasAuthority('test')" )
+public String test(){
+    return "test";
+}
+```
+
+postman 测试
+
+http://localhost:8080/test
 
 
 
@@ -1793,6 +1888,21 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 
 
+在HelloController 中创建测试接口
+
+```java
+//测试正式的接口
+@GetMapping("/test2")
+@PreAuthorize( "hasAuthority('system:dept:list')" )
+public String testMeunPerms(){
+    return "rest2";
+}
+```
+
+postman 测试 
+
+![image-20220301143057657](images/image-20220301143057657.png)
+
 
 
 ## 4. 自定义失败处理
@@ -1866,7 +1976,19 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
                 accessDeniedHandler(accessDeniedHandler);
 ~~~~
 
+测试
 
+注意在 yml 中修改过了端口为8888
+
+http://localhost:8888/login
+
+<img src="images/image-20220301145053501.png" alt="image-20220301145053501" style="zoom:50%;" />
+
+测试权限不足
+
+http://localhost:8888/test3
+
+![image-20220301151327316](images/image-20220301151327316.png)
 
 ## 5. 跨域
 
@@ -2020,7 +2142,7 @@ public class SGExpressionRoot {
 
 
 
-### 基于配置的权限控制
+### 6.2 基于配置的权限控制
 
 ​	我们也可以在配置类中使用使用配置的方式对资源进行权限控制。
 
@@ -2074,7 +2196,7 @@ public class SGExpressionRoot {
 
 
 
-### 认证成功处理器
+### 认证成功处理器（表单登录不是前后端分离项目使用）
 
 ​	实际上在UsernamePasswordAuthenticationFilter进行登录认证的时候，如果登录成功了是会调用AuthenticationSuccessHandler的方法进行认证成功后的处理的。AuthenticationSuccessHandler就是登录成功处理器。
 

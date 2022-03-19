@@ -2,7 +2,7 @@
 
 # 第一天
 
-## 09 [用两个栈实现队列](https://leetcode-cn.com/problems/yong-liang-ge-zhan-shi-xian-dui-lie-lcof/)
+## [剑指 Offer 09 用两个栈实现队列](https://leetcode-cn.com/problems/yong-liang-ge-zhan-shi-xian-dui-lie-lcof/)
 
 
 
@@ -39,7 +39,7 @@ class CQueue {
 }
 ```
 
-## 30 [包含min函数的栈](https://leetcode-cn.com/problems/bao-han-minhan-shu-de-zhan-lcof/)
+## [剑指 Offer 30 包含min函数的栈](https://leetcode-cn.com/problems/bao-han-minhan-shu-de-zhan-lcof/)
 
 ```java
 class MinStack {
@@ -81,7 +81,7 @@ class MinStack {
 
 # 第二天
 
-## 06 [剑指 Offer 06. 从尾到头打印链表](https://leetcode-cn.com/problems/cong-wei-dao-tou-da-yin-lian-biao-lcof/)
+## [剑指 Offer 06. 从尾到头打印链表](https://leetcode-cn.com/problems/cong-wei-dao-tou-da-yin-lian-biao-lcof/)
 
 ```java
  
@@ -119,7 +119,7 @@ class Solution {
 
 
 
-## 24 [剑指 Offer 24. 反转链表](https://leetcode-cn.com/problems/fan-zhuan-lian-biao-lcof/)
+## [剑指 Offer 24. 反转链表](https://leetcode-cn.com/problems/fan-zhuan-lian-biao-lcof/)
 
 ```java
 class Solution {
@@ -152,7 +152,7 @@ class Solution {
 
 
 
-## 35 [剑指 Offer 35. 复杂链表的复制](https://leetcode-cn.com/problems/fu-za-lian-biao-de-fu-zhi-lcof/)
+## [剑指 Offer 35. 复杂链表的复制](https://leetcode-cn.com/problems/fu-za-lian-biao-de-fu-zhi-lcof/)
 
 ```java
 class Solution { //HashMap实现
@@ -185,4 +185,89 @@ class Solution { //HashMap实现
 参考博客https://blog.csdn.net/weixin_46443403/article/details/123054403?spm=1001.2014.3001.5502
 
 # 第三天
+
+## [剑指 Offer 05. 替换空格](https://leetcode-cn.com/problems/ti-huan-kong-ge-lcof/)
+
+方法一
+
+```java
+class Solution {
+    public String replaceSpace(String s) {
+        StringBuilder stringBuilder = new StringBuilder();	
+		String replace = s.replace( " ", "%20" );
+        return replace;
+
+    }
+}
+```
+
+方法二
+
+```java
+class Solution {
+    public String replaceSpace(String s) {
+      StringBuilder stringBuilder = new StringBuilder();
+      
+      for (int i = 0; i < s.length() ; i++) {
+         if(s.charAt(i)== ' '){
+            stringBuilder.append("%20");
+         }else {
+            stringBuilder.append(s.charAt(i));
+         }
+      }
+      return stringBuilder.toString();
+   }
+}
+```
+
+## [剑指 Offer 58 - II. 左旋转字符串](https://leetcode-cn.com/problems/zuo-xuan-zhuan-zi-fu-chuan-lcof/)
+
+方法一
+
+```java
+class Solution {
+    public String reverseLeftWords(String s, int n) {
+        return s.substring( n,s.length() ) + s.substring( 0, n );
+}
+```
+
+方法二
+
+```java
+class Solution {
+    public String reverseLeftWords(String s, int n) {
+        StringBuilder res = new StringBuilder();
+        for (int i = n; i < s.length()  ; i++) {
+            res.append( s.charAt( i ) );
+        }
+
+        for (int i = 0; i < n; i++) {
+            res.append( s.charAt( i ) );
+        }
+        return res.toString();
+    }
+}
+```
+
+# 第4天
+
+## [剑指 Offer 53 - I. 在排序数组中查找数字 I](https://leetcode-cn.com/problems/zai-pai-xu-shu-zu-zhong-cha-zhao-shu-zi-lcof/)
+
+方法一 暴力算法
+
+时间复杂度O(1)
+
+```java
+class Solution {
+    public int search(int[] nums, int target) {
+        int count = 0;
+        for(int i = 0; i < nums.length; i++){
+            if(nums[i] == target){
+                count++;
+            }
+        }
+        return count;
+    }
+}
+```
 
