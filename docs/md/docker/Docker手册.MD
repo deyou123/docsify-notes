@@ -596,11 +596,28 @@ CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS       
 root@6c63da935c90:/# mysql -u root -p
 Enter password: 
 mysql> mysql8.0
+
 ```
+
+> ```shell
+> docker run --name mysql8  -p 3306:3306 -e MYSQL_ROOT_PASSWORD=666666 -d mysql:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+> ```
+>
+> # 一条命令安装mysql 最新版本
+>
+> 删除 msyql
+>
+> > docker rm mysql8
 
 停止服务
 
 > docker stop mysql8.0
+
+# 安装Vim
+
+>  apt-get update
+
+> apt-get install vim
 
 ## 安装mangodb
 

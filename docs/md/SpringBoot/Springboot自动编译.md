@@ -11,7 +11,7 @@
 </dependency>
 ```
 
-设置自动编译：
+设置自动编译：Build->Compiler->Build porject automatically
 
 ![image-20220317201945460](http://typora-dy.oss-cn-beijing.aliyuncs.com/img/image-20220317201945460.png)
 
