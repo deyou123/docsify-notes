@@ -686,7 +686,7 @@ public class DownLoadController {
 
 ​	2.DispatchServlet通过HandlerMapping根据具体的请求查找能处理这个请求的Handler。**（HandlerMapping主要是处理请求和Handler方法的映射关系的）**
 
-​	3.HandlerMapping返回一个能够处理请求的执行链给DispatchServlet，这个链中除了包含Handler方法也包含拦截器。
+​	3.HandlerMapping返回一个能够处理请求的执行链给DispatchServlet，这个链中除了包含Han dler方法也包含拦截器。
 
 ​	4.DispatchServlet拿着执行链去找HandlerAdater执行链中的方法。
 

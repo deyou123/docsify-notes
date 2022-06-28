@@ -546,3 +546,276 @@ int updateUserById(@Param("age") Long age, @Param("id") Long id);
 3. 进行多个 Repository 操作时，也应该使它们在同一个事务中处理，按照分层架构的思想，这部分属于业务逻辑层，因此，需要在Service 层实现对多个 Repository 的调用，并在相应的方法上声明事务。
 
 好了，关于Spring Data Jpa 本文就先说这么多。
+
+# Spring boot 整合 JPA
+
+引入依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+
+```java
+@Entity(name = "t_book")
+@Data
+public class Book {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "b_name")
+    private String name;
+    private String author;
+
+}
+```
+
+```java
+public interface BookDao extends JpaRepository<Book,Long> {
+    List<Book> getBookByAuthorIs(String author);
+
+    @Query(nativeQuery = true,value = "select * from t_book where id=(select max(id) from t_book)")
+    Book maxIdBook();
+
+    @Query("update t_book set b_name=:name where id=:id")
+    @Modifying
+    void updateBookById(String name, Long id);
+}
+```
+
+```java
+@Service
+public class BookService {
+    @Autowired
+    BookDao bookDao;
+    @Transactional
+    public void updateBookById(String name, Long id){
+        bookDao.updateBookById(name, id);
+    }
+}
+```
+
+```java
+@SpringBootTest
+class JpaApplicationTests {
+
+    @Autowired
+    BookDao bookDao;
+
+    @Test
+    void contextLoads() {
+        Book book = new Book();
+        book.setName("三国演义");
+        book.setAuthor("罗贯中");
+        bookDao.save(book);
+    }
+
+    @Test
+    void test1() {
+        List<Book> list = bookDao.findAll();
+        System.out.println("list = " + list);
+        Optional<Book> byId = bookDao.findById(2L);
+        System.out.println("byId = " + byId);
+        bookDao.deleteById(1L);
+    }
+
+    @Test
+    void test2() {
+        //页码从 0 开始记，1 表示第二页
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Order.asc("id")));
+        Page<Book> page = bookDao.findAll(pageRequest);
+        System.out.println("总记录数： " + page.getTotalElements());
+        System.out.println("总页数 " + page.getTotalPages());
+        System.out.println("查到的数据 " + page.getContent());
+        System.out.println("每页的记录数 " + page.getSize());
+        System.out.println("是否还有下一页 " + page.hasNext());
+        System.out.println("是否还有上一页 " + page.hasPrevious());
+        System.out.println("是否最后一页 " + page.isLast());
+        System.out.println("是否第一页 " + page.isFirst());
+        System.out.println("当前页码 " + page.getNumber());
+        System.out.println("当前页的记录数 " + page.getNumberOfElements());
+    }
+
+    @Test
+    void test3() {
+        List<Book> list = bookDao.getBookByAuthorIs("鲁迅");
+        System.out.println("list = " + list);
+    }
+
+
+    @Test
+    void test4() {
+        System.out.println(bookDao.maxIdBook());
+    }
+
+    @Autowired
+    BookService bookService;
+    @Test
+    void test5() {
+        bookService.updateBookById("123", 7L);
+    }
+}
+```
+
+# Spring boot 整合JPA 配置多数据源
+
+![image-20220330151102215](http://typora-dy.oss-cn-beijing.aliyuncs.com/img/image-20220330151102215.png)
+
+引入依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+
+User
+
+```java
+@Entity(name = "user")
+@Data
+public class User {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String username;
+    private String address;
+}
+```
+
+
+
+```java
+public interface UserDao1 extends JpaRepository<User,Long> {
+}
+```
+
+```java
+public interface UserDao2 extends JpaRepository<User,Long> {
+}
+```
+
+```properties
+spring.datasource.one.username=root
+spring.datasource.one.password=666666
+spring.datasource.one.jdbcUrl=jdbc:mysql:///db_01?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+
+spring.datasource.two.username=root
+spring.datasource.two.password=666666
+spring.datasource.two.jdbcUrl=jdbc:mysql:///db_02?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+
+spring.jpa.database=MYSQL
+spring.jpa.database-platform=mysql
+spring.jpa.show-sql=true
+
+# none：默认值，什么都不做，每次启动项目，不会对数据库进行任何验证和操作
+# create：每次运行项目，没有表会新建表，如果表内有数据会被清空
+# create-drop：每次程序结束的时候会清空表
+# update：每次运行程序，没有表会新建表，但是表内有数据不会被清空，只会更新表结构。
+# validate：运行程序会校验数据与数据库的字段类型是否相同，不同会报错
+
+spring.jpa.hibernate.ddl-auto=create-drop
+# 设置数据库方言
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL57Dialect
+## 自动生成表
+spring.jpa.generate-ddl= true 
+```
+
+DataSourceConfig
+
+```java
+@Configuration
+public class DataSourceConfig {
+    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource.one")
+    @Primary
+    DataSource dsOne() {
+        return new HikariDataSource();
+    }
+    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource.two")
+    DataSource dsTwo() {
+        return new HikariDataSource();
+    }
+}
+```
+
+```java
+@Configuration
+@EnableJpaRepositories(basePackages = "org.javaboy.jpamulti.dao1", entityManagerFactoryRef = "localContainerEntityManagerFactoryBean1", transactionManagerRef = "platformTransactionManager1")
+public class JpaConfigOne {
+    @Autowired
+    @Qualifier("dsOne")
+    DataSource ds;
+    @Autowired
+    JpaProperties jpaProperties;
+
+    @Bean
+    @Primary
+    LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean1(EntityManagerFactoryBuilder builder) {
+        return builder.dataSource(ds)
+                .packages("org.javaboy.jpamulti.model")
+                .properties(jpaProperties.getProperties())
+                .persistenceUnit("pu1")
+                .build();
+    }
+
+    @Bean
+    PlatformTransactionManager platformTransactionManager1(EntityManagerFactoryBuilder builder) {
+        return new JpaTransactionManager(localContainerEntityManagerFactoryBean1(builder).getObject());
+    }
+}
+```
+
+```java
+@Configuration
+@EnableJpaRepositories(basePackages = "org.javaboy.jpamulti.dao2", entityManagerFactoryRef = "localContainerEntityManagerFactoryBean2", transactionManagerRef = "platformTransactionManager2")
+public class JpaConfigTwo {
+    @Autowired
+    @Qualifier("dsTwo")
+    DataSource ds;
+    @Autowired
+    JpaProperties jpaProperties;
+
+    @Bean
+    LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean2(EntityManagerFactoryBuilder builder) {
+        return builder.dataSource(ds)
+                .packages("org.javaboy.jpamulti.model")
+                .properties(jpaProperties.getProperties())
+                .persistenceUnit("pu2")
+                .build();
+    }
+
+    @Bean
+    PlatformTransactionManager platformTransactionManager2(EntityManagerFactoryBuilder builder) {
+        return new JpaTransactionManager(localContainerEntityManagerFactoryBean2(builder).getObject());
+    }
+}
+```

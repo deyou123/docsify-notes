@@ -74,8 +74,7 @@ systemctl start docker
 docker version
 ```
 
-> 
->
+
 
 > 8、卸载docer
 >
@@ -83,7 +82,6 @@ docker version
 > yum  remove docker-ce docker-ce-cli containerd.io
 > ```
 >
-> 
 
 > yum -y remove docker-ce docker-ce-cli containerd.io
 
@@ -544,16 +542,16 @@ docker serch nginx
 docker pull nginx 
 
 # 3.运行
-docker run -d --name nginx01 -p 80:80 nginx
+docker run --name nginx -p 80:80 -d nginx
 # 进入容器
-docker exec -it nginx01 /bin/bash
+docker exec -it nginx /bin/bash
 ```
 
 停止服务
 
 > docker stop nginx01
 
-# 安装redis
+## 安装redis
 
 ```shell
 # 搜索
@@ -562,7 +560,7 @@ docker serch redis
 docker pull redis 
 
 # 3.运行
-docker run -d --name redis01 -p 80:80 nginx
+docker run -p 6379:6379 --name redis01 -v /usr/local/docker/redis.conf:/etc/redis/redis.conf -v /usr/local/docker/data:/data -d redis redis-server /etc/redis/redis.conf --appendonly yes
 # 4.  进入容器
 docker exec -it redis01 /bin/bash
 # root@e4e5d5aabc12:/data# 
@@ -575,7 +573,11 @@ redis-cli
 
 > docker stop redis01
 
-# mysql 安装
+删除redis
+
+> docker rm redis01
+
+## mysql 安装
 
 ```shell
 ## 1、下载mysql 镜像
@@ -613,13 +615,133 @@ mysql> mysql8.0
 
 > docker stop mysql8.0
 
-# 安装Vim
+## 安装MONGDB 
+
+### 安装命令
+
+> docker run --name mongodb -p 27017:27017 -d mongo --auth
+
+> docker exec -it mongodb mongo admin
+
+![image-20220415144656652](http://typora-dy.oss-cn-beijing.aliyuncs.com/img/image-20220415144656652.png)
+
+创建用户
+
+> use admin
+
+> db.createUser({user:"root",pwd:"root",roles:[{role:"userAdminAnyDatabase",db:"admin"}]})
+
+> exit
+
+### 远程访问
+
+> docker exec -it mongodb /bin/bash
+>
+> cd /etc
+>
+> cat mongod.conf.orig
+
+复制mongod.conf.orig 中的内容
+
+```
+# mongod.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# Where and how to store data.
+storage:
+  dbPath: /var/lib/mongodb
+  journal:
+    enabled: true
+#  engine:
+#  wiredTiger:
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: /var/log/mongodb/mongod.log
+
+# network interfaces
+net:
+  port: 27017
+  bindIp: 0.0.0.0
+
+
+# how the process runs
+processManagement:
+  timeZoneInfo: /usr/share/zoneinfo
+
+#security:
+
+#operationProfiling:
+
+#replication:
+
+#sharding:
+
+## Enterprise-Only Options:
+
+#auditLog:
+
+#snmp:
+
+```
+
+
+
+> exit
+
+> vim mongod.conf.orig
+
+粘贴内容
+
+修改
+
+`bindIP: 0.0.0.0`
+
+![image-20220415152134275](http://typora-dy.oss-cn-beijing.aliyuncs.com/img/image-20220415152134275.png)
+
+复制修改后的内容到mongdb 容器
+
+> docker cp ./mongod.conf.orig  mongodb:/etc/mongod.conf.orig
+
+> docker restart mongodb
+
+阿里ECS服务器开放安全组
+
+![image-20220415152955338](http://typora-dy.oss-cn-beijing.aliyuncs.com/img/image-20220415152955338.png)
+
+本地系统
+
+如果使用虚拟机则要开放防火墙
+
+> firewall-cmd --permanent --add-port=27017/tcp
+>
+> firewall-cmd --reload
+
+查看端口是否开放
+
+> firewall-cmd --query-port=27017/tcp
+
+Mongdb Compass 连接数据库
+
+连接语法：
+
+mongodb://username:paswd@host:port
+
+![image-20220415160155291](http://typora-dy.oss-cn-beijing.aliyuncs.com/img/image-20220415160155291.png)
+
+
+
+## 安装Vim
 
 >  apt-get update
 
 > apt-get install vim
 
-## 安装mangodb
+
 
 
 
@@ -631,6 +753,19 @@ mysql> mysql8.0
 > ```
 >
 > 
+
+# docker 安装 RabbitMQ
+
+安装命令
+
+> docker run -d --hostname my-rabbit --name rabbit -p 15672:15672 -p 5672:5672 rabbitmq
+
+
+
+通过`docker ps -a`查看部署的mq容器id，在通过 `docker exec -it 7ad48773ca3d /bin/bash` 进入容器内部在
+运行：`rabbitmq-plugins enable rabbitmq_management`
+
+
 
 ## 定制镜像
 
@@ -695,27 +830,11 @@ docker 的理念回顾
 
 
 
-## 实战安装mysql
+## 
 
-![image-20210927124755328](Docker%E6%89%8B%E5%86%8C.images/image-20210927124755328.png)
 
-![image-20210927124839267](Docker%E6%89%8B%E5%86%8C.images/image-20210927124839267.png)
-
-![image-20210927143657121](Docker%E6%89%8B%E5%86%8C.images/image-20210927143657121.png)
-
-![image-20210927143735363](Docker%E6%89%8B%E5%86%8C.images/image-20210927143735363.png)
-
-![image-20210927143816901](Docker%E6%89%8B%E5%86%8C.images/image-20210927143816901.png)
-
-# 发布自己的镜像
 
 # 
-
-
-
-## 部署redis 集群
-
-  
 
 # 安装  docker compose
 
