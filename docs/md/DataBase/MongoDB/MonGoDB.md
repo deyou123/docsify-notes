@@ -386,7 +386,7 @@ MongoDB使用BSON做为文档数据存储和网络传输格式
 
 个文档也可以作为另一个文档的value
 
->db.sang_collect.insert({name:"三国演义",author:{name:"罗贯中",age:99}});
+>db.sang_collect.insertOne({name:"三国演义",author:{name:"罗贯中",age:99}});
 
 ### ObjectId
 

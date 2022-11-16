@@ -108,7 +108,7 @@ Chrome 直接在 App Store 搜索 Elasticsearch-head，点击安装即可。
 
 四个步骤
 
-- `git clone git://github.com/mobz/elasticsearch-head.git`
+- `git clone git clone git@github.com:mobz/elasticsearch-head.git`
 - `cd elasticsearch-head`
 - `npm install`
 - `npm run start`

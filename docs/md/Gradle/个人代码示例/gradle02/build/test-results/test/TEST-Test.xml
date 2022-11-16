@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Test" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-06-30T13:40:01" hostname="DESKTOP-HJO9COB" time="0.013">
+  <properties/>
+  <testcase name="testJunit5()" classname="Test" time="0.013"/>
+  <system-out><![CDATA[test JUnit5
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

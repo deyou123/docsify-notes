@@ -1,0 +1,9 @@
+task say{
+	println "Hello world!"
+	doFirst{
+        println "ready"
+    }
+    doLast{
+        println "thanks"
+    }
+}

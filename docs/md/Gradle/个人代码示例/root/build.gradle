@@ -1,0 +1,128 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+mainClassName ='com.zdy.MainClass'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.register('count') {
+    doLast {
+        4.times { print "$it " }
+    }
+}
+
+
+
+tasks.register("intro"){
+    dependsOn(tasks.hello)
+    doLast{
+        println "I'm Gradle"
+    }
+}
+
+tasks.register('taskX') {
+    dependsOn 'taskY'
+    doLast {
+        println 'taskX'
+    }
+}
+tasks.register('taskY') {
+    doLast {
+        println 'taskY'
+    }
+}
+
+4.times { counter ->
+    tasks.register("task$counter") {
+        doLast {
+            println "I'm task number $counter"
+        }
+    }
+}
+tasks.named('task0') { dependsOn('task2', 'task3') }
+
+/*tasks.register('hello') {
+    doLast {
+        println 'Hello Earth'
+    }
+}
+tasks.named('hello') {
+    doFirst {
+        println 'Hello Venus'
+    }
+}
+tasks.named('hello') {
+    doLast {
+        println 'Hello Mars'
+    }
+}
+tasks.named('hello') {
+    doLast {
+        println 'Hello Jupiter'
+    }
+}*/
+
+task a() {
+    doLast {
+        Thread.sleep(1000)
+        println "当前任务a执行了"
+    }
+    timeout = Duration.ofMillis(500)
+}
+task b() {
+    doLast {
+        println "当前任务b执行了"
+    }
+}
+
+task hello {
+    doLast {
+        println 'hello 尚硅谷的粉丝们'
+    }
+}
+tasks.addRule("对该规则的一个描述，便于调试、查看等"){
+    String taskName -> task(taskName) {
+        doLast {
+            println "该${taskName}任务不存在，请查证后再执行"
+        }
+    }
+}
+
+
+defaultTasks 'myClean', 'myRun'
+tasks.register('myClean'){
+    doLast {
+        println 'Default Cleaning!'
+    }
+}
+tasks.register('myRun') {
+    doLast {
+        println 'Default Running!'
+    }
+}
+tasks.register('other') {
+    doLast {
+        println "I'm not a default task!"
+    }
+}
+
+
+def file = file("src/bean.xml")
+file.createNewFile()

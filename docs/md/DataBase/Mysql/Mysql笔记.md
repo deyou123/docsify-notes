@@ -411,3 +411,247 @@ insert into `test` (`uid`) VALUES(11);
 现在我们应该清楚的知道：长度M与你存放的数值型的数的大小无关.
 
 # 第15章 存储过程与函数
+
+## 存储过程概述
+
+**含义**：存储过程的英文是 Stored Procedure 。它的思想很简单，就是一组经过 预先编译 的 SQL 语句
+
+的封装。
+
+执行过程：存储过程预先存储在 MySQL 服务器上，需要执行的时候，客户端只需要向服务器端发出调用
+
+存储过程的命令，服务器端就可以把预先存储好的这一系列 SQL 语句全部执行。
+
+**好处**： 
+
+1、简化操作，提高了sql语句的重用性，减少了开发程序员的压力 
+
+2、减少操作过程中的失误，提高效率
+
+3、减少网络传输量（客户端不需要把所有的 SQL 语句通过网络发给服务器） 
+
+4、减少了 SQL 语句暴露在网上的风险，也提高了数据查询的安全性
+
+
+
+代码举例
+
+```sql
+DELIMITER $ 
+
+CREATE PROCEDURE select_all_data() 
+BEGIN 
+	SELECT * FROM employees;
+END $
+
+DELIMITER ;
+```
+
+DELIMITER \$  把结束符号换为\$ 符号，
+
+DELIMITER ;   把结束符号换为 **;**
+
+
+
+原生Java 调用存储过程命令
+
+> call select_all_data();
+
+
+
+## 存储函数
+
+举例 创建存储函数，名称为email_by_id()，参数传入emp_id，该函数查询emp_id的email，并返回，数据类型
+
+为字符串型。
+
+```sql
+DELIMITER // 
+CREATE FUNCTION email_by_id(emp_id INT) 
+RETURNS VARCHAR(25) 
+DETERMINISTIC 
+CONTAINS SQL 
+BEGIN
+	RETURN (SELECT email FROM employees WHERE employee_id = emp_id); 
+END // 
+DELIMITER ;
+```
+
+调用
+
+> SET @emp_id = 102; 
+>
+> SELECT email_by_id(102);
+
+![image-20220826162714856](http://typora-dy.oss-cn-beijing.aliyuncs.com/img/image-20220826162714856.png)
+
+## Java 原生代码
+
+### 创建存储函数
+
+```sql
+SET GLOBAL log_bin_trust_function_creators = 1;
+
+ delimiter $
+ create function func_sum(num1 int,num2 int) returns int 
+ begin 
+ declare res int;
+ set res=num1+num2;
+ return res; 
+ end$
+ delimiter ;
+```
+
+
+
+```java
+public static void main(String[] args) throws ClassNotFoundException, SQLException {
+    Class.forName("com.mysql.cj.jdbc.Driver"); //用反射的方式将驱动包加载到内存中
+    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/db15?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC","root","666666");
+    String sql = "select func_sum(?,?) as res";
+    PreparedStatement pstat = conn.prepareStatement( sql );
+    pstat.setInt(1,20);
+    pstat.setInt(2,230);
+    ResultSet rs = pstat.executeQuery();
+    while (rs.next()){
+        System.out.println(rs.getInt("res"));
+    }
+
+}
+```
+
+
+
+### 创建存储过程
+
+```sql
+delimiter $
+create procedure proc_sum(in num1 integer,in num2 integer,out he integer)
+begin
+set he=num1+num2;
+end$
+delimiter ;
+```
+
+
+
+```java
+public static void main(String[] args) throws ClassNotFoundException, SQLException {
+    Class.forName("com.mysql.cj.jdbc.Driver"); //用反射的方式将驱动包加载到内存中
+    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/db15?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC","root","666666");
+    String sql = "{call proc_sum(?,?,?)}";
+    CallableStatement cs = conn.prepareCall(sql);
+    cs.setInt(1,20);
+    cs.setInt(2,30);
+    cs.registerOutParameter(3, Types.INTEGER);
+    cs.execute();
+    System.out.println(cs.getInt(3));
+    conn.close();
+}
+```
+
+### Mybatis 项目使用存储过程
+
+```sql
+CREATE TABLE `t_user`  (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `sex` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `age` int NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_user
+-- ----------------------------
+INSERT INTO `t_user` VALUES (1, 'tom', '1', 20);
+```
+
+
+
+存储过程
+
+```sql
+CREATE  PROCEDURE `getUserById`(IN `u_id` int)
+BEGIN
+	
+	SELECT id,name,sex,age FROM t_user WHERE id=u_id;
+END
+```
+
+
+
+```java
+@Data
+@TableName("t_user")
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private Integer id;
+
+    private String name;
+
+    private String sex;
+
+    private Integer age;
+
+}
+```
+
+```java
+public interface UserMapper extends BaseMapper<User> {
+    //根据id查询用户
+    User getUserById(Integer id);
+}
+```
+
+```java
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatispro2.mapper.UserMapper">
+    <!-- 根据id查询用户 -->
+    <select id="getUserById" parameterType="Integer" resultType="com.example.mybatispro2.entity.User" statementType="CALLABLE">
+        {call getUserById(#{id,mode=IN})}
+    </select>
+</mapper>
+```
+
+```java
+@RestController
+@RequestMapping("/user")
+public class UserController {
+    @Autowired
+    private UserMapper userMapper;
+    @GetMapping("/getUsers")
+    public String getUsers() {
+
+        User user = userMapper.getUserById( 1 );
+        System.out.println("添加成功，增加的id="+user.toString());
+        return "查询用户成功！";
+    }
+}
+```
+
+```java
+@RestController
+@RequestMapping("/user")
+public class UserController {
+    @Autowired
+    private UserMapper userMapper;
+    @GetMapping("/getUsers")
+    public User getUsers() {
+
+        return userMapper.getUserById( 1 );
+    }
+}
+```
+
+http://localhost:8080/user/getUsers
+
+输出结果
+
+```json
+{"id":1,"name":"tom","sex":"1","age":20}
+```
+

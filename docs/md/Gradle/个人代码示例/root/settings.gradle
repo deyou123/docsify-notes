@@ -1,0 +1,7 @@
+rootProject.name = 'root'
+include 'subproject01'
+include 'subproject02'
+include 'subproject03'
+include 'subproject01:suproject001'
+findProject(':subproject01:suproject001')?.name = 'suproject001'
+
